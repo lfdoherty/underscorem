@@ -1,6 +1,6 @@
 {
 	"name": "underscorem",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Extensions to underscore.",
 	"author": "Liam Doherty",
 	"main": "underscorem",
@@ -8,6 +8,6 @@
 		"underscore": ">=1.1.4"
 	},
 	"engines": {
-		 "node" : "0.4"
+		 "node" : "0.6"
 	}
 }
