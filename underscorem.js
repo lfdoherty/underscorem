@@ -6,6 +6,61 @@ var sys = require('util');
 
 var Buffer = require('buffer').Buffer;
 
+function makeOnce(keyFunction, actionFunction){
+	var manyArgs = actionFunction.length-1
+	var active = {}
+	var count = 0;
+	return function(){
+		var args = Array.prototype.slice.apply(arguments);
+		var cb = args[args.length-1];
+		var realArgs = args.slice(0, args.length-1)
+		var key = keyFunction.apply(undefined, realArgs)
+		var listeners;
+		function specialCb(){
+			active[key] = undefined;
+			var args = Array.prototype.slice.apply(arguments);
+			listeners.forEach(function(listener){
+				listener.apply(undefined, args)
+			})
+		}
+
+		if(!active[key]){
+			listeners = active[key] = [cb]
+			actionFunction.apply(undefined, realArgs.concat([specialCb]))
+		}else{
+			active[key].push(cb);
+		}
+	}
+}
+function makeOnceWithDone(keyFunction, actionFunction, doneFunction){
+	var manyArgs = actionFunction.length-1
+	var active = {}
+	var count = 0;
+	return function(){
+		var args = Array.prototype.slice.apply(arguments);
+		var cb = args[args.length-1];
+		var realArgs = args.slice(0, args.length-1)
+		var key = keyFunction.apply(undefined, realArgs)
+		var listeners;
+		function specialCb(){
+			--count;
+			if(doneFunction) doneFunction(count)
+			active[key] = undefined;
+			var args = Array.prototype.slice.apply(arguments);
+			listeners.forEach(function(listener){
+				listener.apply(undefined, args)
+			})
+		}
+
+		if(!active[key]){
+			listeners = active[key] = [cb]
+			++count;
+			actionFunction.apply(undefined, realArgs.concat([specialCb]))
+		}else{
+			active[key].push(cb);
+		}
+	}
+}
 
 var more = {
 	log: function(msg){
@@ -17,13 +72,14 @@ var more = {
 	},
 	errout: function(msg){
 		if(typeof(exports) !== undefined){
-			if(msg.length > 200) msg = msg.substr(0, 200) + '...';
-			sys.debug(msg);
-			sys.debug(new Error().stack);
-			throw msg;
+			if(msg.length > 300) msg = msg.substr(0, 300) + '...';
+			console.log(msg);
+			//sys.debug(msg);
+			console.log(new Error().stack);
+			throw new Error(msg);
 		}else{
 			_.log(msg);
-			throw msg;
+			throw new Error(msg);
 		}
 	},
 	remove: function(list, value){
@@ -37,6 +93,7 @@ var more = {
 		});
 	},
 	latch: function(count, millisecondsUntilFailure, doneCb, failureCb){
+		_.assertInt(count)
 
 		var counter = count;
 		
@@ -52,8 +109,12 @@ var more = {
 			millisecondsUntilFailure = undefined;
 		}
 	
-		if(count === 0){
+		if(count === 0){				
+			if(timeoutHandle !== undefined){
+				clearTimeout(timeoutHandle);
+			}
 			doneCb();
+			return {};
 		}	
 		
 		var f = function(){
@@ -72,6 +133,90 @@ var more = {
 		}
 		
 		return f;
+	},
+	doOnce: function(keyFunction, actionFunction, doneFunction){
+		if(doneFunction){
+			return makeOnceWithDone(keyFunction, actionFunction, doneFunction)
+		}else{
+			return makeOnce(keyFunction, actionFunction)
+		}
+	},
+	memoizeAsync: function(actionFunction, keyFunction){
+		if(keyFunction === undefined) keyFunction = function(v){return v;}
+		
+		var manyArgs = actionFunction.length-1
+		var active = {}
+		var stored = {}
+		var count = 0;
+		var storedArgs = {}
+		var f = function(){
+			var args = Array.prototype.slice.apply(arguments);
+			var cb = args[args.length-1];
+			var realArgs = args.slice(0, args.length-1)
+			var key = keyFunction.apply(undefined, realArgs)
+			storedArgs[key] = realArgs
+
+			if(stored[key]){
+				//console.log('calling back from stored: ' + key)
+				cb.apply(undefined, stored[key])
+				return
+			}
+			
+			var listeners;
+			function specialCb(){
+				active[key] = undefined;
+				var args = Array.prototype.slice.apply(arguments);
+				//console.log('storing for: ' + key)
+				stored[key] = args;
+				listeners.forEach(function(listener){
+					listener.apply(undefined, args)
+				})
+			}
+
+			if(!active[key]){
+				//console.log('loading normally: ' + key + ' ' + JSON.stringify(active[key]))
+				listeners = active[key] = [cb]
+				actionFunction.apply(undefined, realArgs.concat([specialCb]))
+			}else{
+				active[key].push(cb);
+			}
+		}
+		//f.replace = function(key, newArguments){
+		//	stored[key] = newArguments;
+		//}
+		f.clear = function(){
+			var args = Array.prototype.slice.apply(arguments);
+			var key = keyFunction.apply(undefined, args)
+			stored[key] = undefined
+		}
+		f.refresh = function(){
+			var args = Array.prototype.slice.apply(arguments);
+			var key = keyFunction.apply(undefined, args)
+			var realArgs = storedArgs[key]
+			_.assertDefined(realArgs)
+			//console.log('cleared stored: ' + key)
+			stored[key] = undefined
+			function refreshSpecialCb(){
+				active[key] = undefined;
+				var args = Array.prototype.slice.apply(arguments);
+				//console.log('after refresh, storing for: ' + key)
+				stored[key] = args;
+				listeners.forEach(function(listener){
+					//console.log('refresh calling listener')
+					listener.apply(undefined, args)
+				})
+			}
+			if(!active[key]){
+				var listeners = active[key] = []
+				//console.log('applying action function')
+				actionFunction.apply(undefined, realArgs.concat([refreshSpecialCb]))
+			}else{
+				//_.errout('already refreshing - TODO')
+				//active[key].push(cb);
+			}
+
+		}
+		return f
 	},
 	assert: function(v){
 		if(!v){
@@ -172,6 +317,9 @@ var more = {
 	},
 	isInteger: function(v){
 		return typeof(v) === 'number' && (v>>0) === v;
+	},
+	isLong: function(v){
+		return Math.round(v) === v;
 	},
 	isInt: function(v){
 		return typeof(v) === 'number' && (v>>0) === v;
