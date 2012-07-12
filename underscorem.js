@@ -6,6 +6,10 @@ var sys = require('util');
 
 var Buffer = require('buffer').Buffer;
 
+exports.module = module
+//exports.blacklist = ['./underscorem']
+exports.base = './js/underscore_extensions'
+
 function makeOnce(keyFunction, actionFunction){
 	var manyArgs = actionFunction.length-1
 	var active = {}
@@ -72,7 +76,7 @@ var more = {
 	},
 	errout: function(msg){
 		if(typeof(exports) !== undefined){
-			if(msg.length > 300) msg = msg.substr(0, 300) + '...';
+			if(msg.length > 1000) msg = msg.substr(0, 1000) + '...';
 			console.log(msg);
 			//sys.debug(msg);
 			console.log(new Error().stack);
@@ -152,6 +156,7 @@ var more = {
 		var f = function(){
 			var args = Array.prototype.slice.apply(arguments);
 			var cb = args[args.length-1];
+			_.assertFunction(cb)
 			var realArgs = args.slice(0, args.length-1)
 			var key = keyFunction.apply(undefined, realArgs)
 			storedArgs[key] = realArgs
