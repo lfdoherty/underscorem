@@ -1,7 +1,4 @@
 
-//#requires underscore/underscore
-
-
 function log(msg){
 	if(window.console && window.console.log) console.log(msg);
 }
