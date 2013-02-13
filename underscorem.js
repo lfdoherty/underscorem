@@ -8,7 +8,7 @@ var Buffer = require('buffer').Buffer;
 
 exports.module = module
 //exports.blacklist = ['./underscorem']
-exports.base = './js/underscore_extensions'
+//exports.base = './js/underscore_extensions'
 
 function makeOnce(keyFunction, actionFunction){
 	var manyArgs = actionFunction.length-1

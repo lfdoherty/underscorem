@@ -1,9 +1,10 @@
 {
 	"name": "underscorem",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"description": "Extensions to underscore.",
 	"author": "Liam Doherty",
 	"main": "underscorem",
+	"jsmain": "./js/underscore_extensions",
 	"dependencies" : {
 		"underscore": ">=1.1.4"
 	},
