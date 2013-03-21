@@ -27,10 +27,17 @@ _.mixin({
 		
 		var timeoutHandle;
 		
+		var stack = new Error().stack
+		
 		if(arguments.length === 4){
 			timeoutHandle = setTimeout(function(){
 				failureCb(counter);
 			}, millisecondsUntilFailure);
+		}else if(arguments.length === 3){
+			doneCb = failureCb
+			failureCb = function(){
+				console.log('WARNING: latch timing out: ' + stack)
+			}
 		}else{
 			_.assertLength(arguments, 2);
 			doneCb = arguments[1];

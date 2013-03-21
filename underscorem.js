@@ -107,9 +107,16 @@ var more = {
 			timeoutHandle = setTimeout(function(){
 				failureCb(counter);
 			}, millisecondsUntilFailure);
+		}else if(arguments.length === 3){
+			//var stack = new Error().stack
+			timeoutHandle = setTimeout(function(){
+				//if(Math.random() < .1) console.log('WARNING: latch timing out: ' + stack)
+				timeoutHandle = undefined
+			}, millisecondsUntilFailure);
 		}else{
 			_.assertLength(arguments, 2);
 			doneCb = arguments[1];
+			_.assertFunction(doneCb)
 			millisecondsUntilFailure = undefined;
 		}
 	
@@ -125,11 +132,12 @@ var more = {
 			--counter;
 		
 			if(counter === 0){
-				
+				//console.log('HERE: ' + millisecondsUntilFailure)
 				if(timeoutHandle !== undefined){
+					//console.log('clearing timout')
 					clearTimeout(timeoutHandle);
 				}
-				
+				//console.log('cbin')
 				doneCb();
 			}else if(counter < 0){
 				_.errout('latch counter is negative: programmer error : ' + (f.description !== undefined ? (': ' + f.description) : ''));
