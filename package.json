@@ -1,12 +1,13 @@
 {
 	"name": "underscorem",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"description": "Extensions to underscore.",
 	"author": "Liam Doherty",
 	"main": "underscorem",
 	"jsmain": "./js/underscore_extensions",
 	"dependencies" : {
-		"underscore": ">=1.1.4"
+		"underscore": ">=1.1.4",
+	    "seedrandom": "git://github.com/lfdoherty/seedrandom.git"
 	},
 	"engines": {
 		 "node" : ">=0.6"

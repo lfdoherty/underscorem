@@ -76,7 +76,7 @@ var more = {
 	},
 	errout: function(msg){
 		if(typeof(exports) !== undefined){
-			if(msg.length > 1000) msg = msg.substr(0, 1000) + '...';
+			if(msg.length > 1000) msg = msg.substr(0, 1000) + '...' + msg.substr(msg.length-1000);
 			console.log(msg);
 			//sys.debug(msg);
 			console.log(new Error().stack);
@@ -101,6 +101,14 @@ var more = {
 
 		var counter = count;
 		
+		
+		/*var err = new Error().stack
+		var tempTimeoutHandle
+		tempTimeoutHandle = setTimeout(function(){
+			console.log('LATCH TIMED OUT: ' + err)
+		},2000)
+		*/
+		
 		var timeoutHandle;
 		
 		if(arguments.length === 4){
@@ -124,6 +132,7 @@ var more = {
 			if(timeoutHandle !== undefined){
 				clearTimeout(timeoutHandle);
 			}
+			//clearTimeout(tempTimeoutHandle)
 			doneCb();
 			return {};
 		}	
@@ -137,6 +146,7 @@ var more = {
 					//console.log('clearing timout')
 					clearTimeout(timeoutHandle);
 				}
+				//clearTimeout(tempTimeoutHandle)
 				//console.log('cbin')
 				doneCb();
 			}else if(counter < 0){
@@ -343,6 +353,9 @@ var more = {
 	},
 	isPrimitive: function(v){
 		return !_.isArray(v) && !_.isObject(v);
+	},
+	isBuffer: function(v){
+		return (v instanceof Buffer)
 	},
 	//Use to descend into a json object without having to check for attributes on each descent.
 	//For example: the expression obj.a.b.c will be fine if obj = {a: {b: {c: 'blah'}}}, but throw an exception if obj = {}.

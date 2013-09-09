@@ -95,11 +95,11 @@ _.mixin({
 	},
 	assertEqual: function(a, b){
 		if(a !== b){
-			if(typeof(exports) !== 'undefined'){
+			/*if(typeof(exports) !== 'undefined'){
 				_.errout('Values should be equal, but are not: ' + sys.inspect(a) + ', ' + sys.inspect(b));
-			}else{
+			}else{*/
 				_.errout('Values should be equal, but are not: ' + (a!=undefined?a.toString():a) + ', ' + (b!=undefined?b.toString():b));
-			}
+			//}
 		}
 	},
 	assertArray: function(v){
