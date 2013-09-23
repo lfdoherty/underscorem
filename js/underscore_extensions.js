@@ -152,6 +152,9 @@ _.mixin({
 	isPrimitive: function(v){
 		return !_.isArray(v) && !_.isObject(v);
 	},
+	isBuffer: function(v){
+		return false
+	},
 	sameArray: function(a,b){
 		if(a.length !== b.length) return false;
 		for(var i=0;i<a.length;++i){
