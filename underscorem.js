@@ -2,9 +2,7 @@
 
 var _ = require("underscore");
 
-var sys = require('util');
-
-var Buffer = require('buffer').Buffer;
+//var sys = require('util');
 
 exports.module = module
 //exports.blacklist = ['./underscorem']
