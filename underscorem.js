@@ -80,13 +80,13 @@ var more = {
 			console.log(new Error().stack);
 			throw new Error(msg);
 		}else{
-			_.log(msg);
+			more.log(msg);
 			throw new Error(msg);
 		}
 	},
 	remove: function(list, value){
 		var i = list.indexOf(value);
-		if(i === -1) _.errout('list does not contain value: ' + value);
+		if(i === -1) more.errout('list does not contain value: ' + value);
 		list.splice(i, 1);
 	},
 	removeAll: function(list, otherList){
@@ -95,7 +95,7 @@ var more = {
 		});
 	},
 	latch: function(count, millisecondsUntilFailure, doneCb, failureCb){
-		_.assertInt(count)
+		more.assertInt(count)
 
 		var counter = count;
 		
@@ -120,9 +120,9 @@ var more = {
 				timeoutHandle = undefined
 			}, millisecondsUntilFailure);
 		}else{
-			_.assertLength(arguments, 2);
+			more.assertLength(arguments, 2);
 			doneCb = arguments[1];
-			_.assertFunction(doneCb)
+			more.assertFunction(doneCb)
 			millisecondsUntilFailure = undefined;
 		}
 	
@@ -148,7 +148,7 @@ var more = {
 				//console.log('cbin')
 				doneCb();
 			}else if(counter < 0){
-				_.errout('latch counter is negative: programmer error : ' + (f.description !== undefined ? (': ' + f.description) : ''));
+				more.errout('latch counter is negative: programmer error : ' + (f.description !== undefined ? (': ' + f.description) : ''));
 			}	
 		}
 		
@@ -172,7 +172,7 @@ var more = {
 		var f = function(){
 			var args = Array.prototype.slice.apply(arguments);
 			var cb = args[args.length-1];
-			_.assertFunction(cb)
+			more.assertFunction(cb)
 			var realArgs = args.slice(0, args.length-1)
 			var key = keyFunction.apply(undefined, realArgs)
 			storedArgs[key] = realArgs
@@ -214,7 +214,7 @@ var more = {
 			var args = Array.prototype.slice.apply(arguments);
 			var key = keyFunction.apply(undefined, args)
 			var realArgs = storedArgs[key]
-			_.assertDefined(realArgs)
+			more.assertDefined(realArgs)
 			//console.log('cleared stored: ' + key)
 			stored[key] = undefined
 			function refreshSpecialCb(){
@@ -241,97 +241,97 @@ var more = {
 	},
 	assert: function(v){
 		if(!v){
-			_.errout('assertion failed');
+			more.errout('assertion failed');
 		}
 	},
 	assertNot: function(v){
 		if(v){
-			_.errout('assertion failed');
+			more.errout('assertion failed');
 		}
 	},
 	assertLength: function(arr, len, msg){
 		if(arr.length !== len){
 			var m = msg || 'Expected ' + len + ' values, but instead there are ' + arr.length;
-			_.errout(m);
+			more.errout(m);
 		}
 	},
 	assertString: function(v){
 		if(typeof(v) !== 'string'){
-			_.errout('Expected string, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected string, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertObject: function(v){
 		if(typeof(v) !== 'object'){
-			_.errout('Expected object, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected object, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertFunction: function(v){
 		if(typeof(v) !== 'function'){
-			_.errout('Expected function, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected function, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertEqual: function(a, b){
 		if(a !== b){
 			if(typeof(exports) !== undefined){
-				_.errout('Values should be equal, but are not: ' + sys.inspect(a) + ', ' + sys.inspect(b));
+				more.errout('Values should be equal, but are not: ' + sys.inspect(a) + ', ' + sys.inspect(b));
 			}else{
-				_.errout('Values should be equal, but are not: ' + a.toString() + ', ' + b.toString());
+				more.errout('Values should be equal, but are not: ' + a.toString() + ', ' + b.toString());
 			}
 		}
 	},
 	assertInt: function(v){
 		if(typeof(v) !== 'number'){
-			_.errout('Expected integer, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected integer, got ' + typeof(v) + ': ' + v);
 		}
 		if((v>>0) !== v){
-			_.errout('value ' + v + ' is not the same as its integer conversion ' + (v>>0) + ' - expected integer.');
+			more.errout('value ' + v + ' is not the same as its integer conversion ' + (v>>0) + ' - expected integer.');
 		}
 	},
 	assertNumber: function(v){
 		if(typeof(v) !== 'number'){
-			_.errout('Expected number, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected number, got ' + typeof(v) + ': ' + v);
 		}
 		if(isNaN(v)){
-			_.errout('Expected number, got NaN');
+			more.errout('Expected number, got NaN');
 		}
 	},
 	assertBoolean: function(v){
 		if(v !== true && v !== false){
-			_.errout('Expected boolean, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected boolean, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertBuffer: function(v){
 		if(!(v instanceof Buffer)){
-			_.errout('Expected buffer, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected buffer, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertArray: function(v){
 		if(!(v instanceof Array)){
-			_.errout('Expected Array, got ' + typeof(v) + ': ' + v);
+			more.errout('Expected Array, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertPrimitive: function(v){
 		if(_.isArray(v) || _.isObject(v)){
-			_.errout('expected primitive, got ' + typeof(v) + ': ' + v);
+			more.errout('expected primitive, got ' + typeof(v) + ': ' + v);
 		}
 	},
 	assertDefined: function(v){
 		if(v === undefined){
-			_.errout('value is undefined');
+			more.errout('value is undefined');
 		}
 	},
 	assertUndefined: function(v){
 		if(v !== undefined){
-			_.errout('value should be undefined');
+			more.errout('value should be undefined');
 		}
 	},
 	assertNotNull: function(v){
 		if(v === null){
-			_.errout('value is null (not undefined, null!) - never do that!');
+			more.errout('value is null (not undefined, null!) - never do that!');
 		}
 	},
 	assertIn: function(arr, value){
-		if(!more.isIn(arr, value)) _.errout('cannot find value(' + value + ') in array: ' + JSON.stringify(arr));
+		if(!more.isIn(arr, value)) more.errout('cannot find value(' + value + ') in array: ' + JSON.stringify(arr));
 	},
 	isObject: function(v){
 		return !_.isArray(v) && typeof(v) === 'object';
@@ -346,7 +346,7 @@ var more = {
 		return typeof(v) === 'number' && (v>>0) === v;
 	},
 	isIn: function(arr, value){
-		_.assertArray(arr);
+		more.assertArray(arr);
 		return arr.indexOf(value) !== -1;
 	},
 	isPrimitive: function(v){
@@ -396,10 +396,10 @@ var more = {
 	},
 	
 	assureOnce: function(f){
-		_.assertFunction(f);
+		more.assertFunction(f);
 		var called = false;
 		return function(){
-			if(called) _.errout('already called this function that should only be called once ever.');
+			if(called) more.errout('already called this function that should only be called once ever.');
 			called = true;
 			f.apply(this, Array.prototype.slice.call(arguments, 0));
 		}
