@@ -4,7 +4,7 @@ var _ = require("underscore");
 
 //var sys = require('util');
 
-exports.module = module
+//exports.module = module
 //exports.blacklist = ['./underscorem']
 //exports.base = './js/underscore_extensions'
 
@@ -418,8 +418,8 @@ var more = {
 
 more.once = more.assureOnce;
 
-_.mixin(more);
+//_.mixin(more);
 
-_.extend(exports, _);
+_.extend(exports, _, more);
 
 
